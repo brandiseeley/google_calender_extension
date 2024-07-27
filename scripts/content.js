@@ -1,5 +1,26 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-console.log('script loaded');
+function selectElement(selector, attempts = 10, delay = 100) {
+  return new Promise((resolve, reject) => {
+    let attemptCount = 0;
+
+    const trySelect = () => {
+      const element = document.querySelector(selector);
+      if (element) {
+        resolve(element);
+      } else {
+        attemptCount++;
+        if (attemptCount >= attempts) {
+          reject(new Error(`Element not found after ${attempts} attempts`));
+        } else {
+          setTimeout(trySelect, delay);
+        }
+      }
+    };
+
+    trySelect();
+  });
+}
 
 function allTimeZones() {
   let list = document.querySelector('ul.VfPpkd-rymPhb.r6B9Fd.bwNLcf.P2Hi5d.VfPpkd-OJnkse.Pl5J1c');
@@ -16,17 +37,18 @@ function matchingOptions(text, options) {
   });
 }
 
-document.addEventListener('click', event => {
-  let button = event.target.closest('#yDmH0d > div.VfPpkd-Sx9Kwc.cC1eCc.UDxLd.PzCPDd.CTxAtc.RQS0nc.CQHNZc.VfPpkd-Sx9Kwc-OWXEXe-FNFY6c > div.VfPpkd-wzTsW > div > div.VfPpkd-cnG4Wd > div > div > div > div:nth-child(1) > div > div');
+document.addEventListener('click', async event => {
+  // If we already added the search bar, don't do it again
+  if (document.getElementById('timeZoneSearchBar')) return;
+  let button = document.querySelector('#yDmH0d > div.VfPpkd-Sx9Kwc.cC1eCc.UDxLd.PzCPDd.CTxAtc.RQS0nc.CQHNZc.VfPpkd-Sx9Kwc-OWXEXe-FNFY6c > div.VfPpkd-wzTsW > div > div.VfPpkd-cnG4Wd > div > div > div > div:nth-child(1) > div > div');
   if (!button) return;
   console.log('Time zones opened.');
 
-  // TODO: This is the correct selector, but the element hasn't been created
-  //       yet when we try to select it. Write function to try selecting it
-  //       and retry finite times after delay.
-  let div = document.querySelector('#yDmH0d > div.VfPpkd-Sx9Kwc.cC1eCc.UDxLd.PzCPDd.CTxAtc.RQS0nc.CQHNZc.VfPpkd-Sx9Kwc-OWXEXe-FNFY6c > div.VfPpkd-wzTsW > div > div.VfPpkd-cnG4Wd > div > div > div > div:nth-child(1) > div > div > div.VfPpkd-xl07Ob-XxIAqe.VfPpkd-xl07Ob-XxIAqe-OWXEXe-qbOKL.VfPpkd-xl07Ob.VfPpkd-YPmvEd.s8kOBc.dmaMHc.d04Lt.dzaSm.VfPpkd-xl07Ob-XxIAqe-OWXEXe-uxVfW-FNFY6c-uFfGwd.VfPpkd-xl07Ob-XxIAqe-OWXEXe-FNFY6c');
+  // TODO: Try/Catch
+  let div = await selectElement('#yDmH0d > div.VfPpkd-Sx9Kwc.cC1eCc.UDxLd.PzCPDd.CTxAtc.RQS0nc.CQHNZc.VfPpkd-Sx9Kwc-OWXEXe-FNFY6c > div.VfPpkd-wzTsW > div > div.VfPpkd-cnG4Wd > div > div > div > div:nth-child(1) > div > div > div.VfPpkd-xl07Ob-XxIAqe.VfPpkd-xl07Ob-XxIAqe-OWXEXe-qbOKL.VfPpkd-xl07Ob.VfPpkd-YPmvEd.s8kOBc.dmaMHc.d04Lt.dzaSm.VfPpkd-xl07Ob-XxIAqe-OWXEXe-uxVfW-FNFY6c-uFfGwd.VfPpkd-xl07Ob-XxIAqe-OWXEXe-FNFY6c');
 
   let searchBar = document.createElement('input');
+  searchBar.setAttribute('id', 'timeZoneSearchBar');
   searchBar.setAttribute('type', 'text');
 
   div.prepend(searchBar);
@@ -48,6 +70,8 @@ document.addEventListener('click', event => {
     });
   });
 
-  searchBar.focus();
-  searchBar.select();
+  setTimeout(() => {
+    searchBar.focus();
+    searchBar.scrollIntoView();
+  }, 0);
 });
